@@ -98,11 +98,12 @@ static void event_loop_thread(const void *arg)
     // cleanup the scheduler timer resources which are not needed anymore
     eventOS_scheduler_timer_stop();
 
-    // signal the ns_event_loop_thread_stop() that it can continue 
+    // signal the ns_event_loop_thread_stop() that it can continue
     status = pal_osSemaphoreRelease(event_stop_sema_id);
     assert(PAL_SUCCESS == status);
 }
 
+#if !MBED_CONF_NANOSTACK_HAL_EVENT_LOOP_DISPATCH_FROM_APPLICATION
 void ns_event_loop_thread_create(void)
 {
     int32_t counters = 0;
@@ -146,10 +147,11 @@ void ns_event_loop_thread_stop(void)
     eventOS_scheduler_signal();
 
     // wait until the event loop has been stopped and the thread is shutting down.
-    // Note: the PAL API does not have any better means to join with a thread termination. 
+    // Note: the PAL API does not have any better means to join with a thread termination.
     status = pal_osSemaphoreWait(event_stop_sema_id, UINT32_MAX, NULL);
     assert(PAL_SUCCESS == status);
 
     pal_osSemaphoreDelete(&event_start_sema_id);
     pal_osSemaphoreDelete(&event_stop_sema_id);
 }
+#endif

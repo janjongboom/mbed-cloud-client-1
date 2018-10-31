@@ -19,6 +19,10 @@
 #include "pal_plat_network.h"
 
 #include "mbed.h"
+#include "mbed_shared_queues.h"
+#include "SocketAddress.h"
+#include "TCPSocket.h"
+#include "UDPSocket.h"
 
 #define TRACE_GROUP "PAL"
 
@@ -366,17 +370,21 @@ void palConnectCallBack()
         nsapi_error_t PALSocketWrapper::listen(int backlog )
         {
             nsapi_error_t status = NSAPI_ERROR_OK;
+#ifndef TARGET_SIMULATOR
             PAL_VALIDATE_CONDITION_WITH_ERROR(((false == initialized) || (PAL_SOCK_STREAM_SERVER != socketTypeVal)), NSAPI_ERROR_PARAMETER); // udp sockets only
             status = ((TCPServer*)activeSocket)->listen(backlog);
+#endif
             return  status;
         }
 
         nsapi_error_t PALSocketWrapper::accept(TCPSocket *connection, SocketAddress *address)
         {
             nsapi_error_t status = NSAPI_ERROR_OK;
+#ifndef TARGET_SIMULATOR
             PAL_VALIDATE_CONDITION_WITH_ERROR(((false == initialized) || (PAL_SOCK_STREAM_SERVER != socketTypeVal)),NSAPI_ERROR_PARAMETER); // udp sockets only
 
             status = ((TCPServer*)activeSocket)->accept(connection, address);
+#endif
             return  status;
         }
 
@@ -644,10 +652,12 @@ palStatus_t pal_plat_socket(palSocketDomain_t domain, palSocketType_t type, bool
     {
         internalSocket = new TCPSocket(s_pal_networkInterfacesSupported[interfaceNum]);
     }
+#ifndef TARGET_SIMULATOR
     else if ((s_pal_numberOFInterfaces > interfaceNum) && (PAL_SOCK_STREAM_SERVER == type) && ((PAL_AF_INET == domain) || (PAL_AF_INET6 == domain) || (PAL_AF_UNSPEC == domain))) // check correct parameters for TCP Server socket
     {
         internalSocket = new TCPServer(s_pal_networkInterfacesSupported[interfaceNum]);
     }
+#endif // TARGET_SIMULATOR
 #endif
     else
     {
@@ -1120,10 +1130,12 @@ palStatus_t pal_plat_asynchronousSocket(palSocketDomain_t domain, palSocketType_
     {
         internalSocket = new TCPSocket(s_pal_networkInterfacesSupported[interfaceNum]);
     }
+#ifndef TARGET_SIMULATOR
     else if ((s_pal_numberOFInterfaces > interfaceNum) && (PAL_SOCK_STREAM_SERVER == type) && ((PAL_AF_INET == domain) || (PAL_AF_INET6 == domain) || (PAL_AF_UNSPEC == domain))) //check that we got correct parameters for TCP Server socket
     {
         internalSocket = new TCPServer(s_pal_networkInterfacesSupported[interfaceNum]);
     }
+#endif // TARGET_SIMULATOR
 #endif
     else
     {
@@ -1236,7 +1248,7 @@ palStatus_t pal_plat_getAddressInfoAsync(pal_asyncAddressInfo* info)
     }
     else {
         /* Skip over setting queryHandle when:
-         * 1. info->queryHandle not allocated  
+         * 1. info->queryHandle not allocated
          * 2. if result is zero then callback pal_plat_getAddressInfoAsync_callback will be called immediately and address info has been deallocated. */
         if ( (info->queryHandle != NULL) && result) {
             *(info->queryHandle) = result;

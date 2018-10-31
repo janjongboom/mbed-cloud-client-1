@@ -18,6 +18,7 @@
 
 #include "update-client-pal-blockdevice/arm_uc_pal_blockdevice_platform.h"
 #include "mbed.h"
+#include "BlockDevice.h"
 
 extern BlockDevice *arm_uc_blockdevice;
 

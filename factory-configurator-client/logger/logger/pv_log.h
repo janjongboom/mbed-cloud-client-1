@@ -1,12 +1,12 @@
 // ----------------------------------------------------------------------------
 // Copyright 2016-2017 ARM Ltd.
-//  
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//  
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-//  
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -165,7 +165,7 @@ do{ \
         mbed_tracef(level, "fcc","%s:%d:%s:" format, file, line, func, ##__VA_ARGS__);\
 } while (0)
 
-#define _SA_PV_BYTE_BUFF_LOG(level, file, line, func, name, buff, buff_size) ( mbed_tracef(level, "fcc", "%s"name, mbed_trace_array(buff, buff_size)))
+#define _SA_PV_BYTE_BUFF_LOG(level, file, line, func, name, buff, buff_size) ( mbed_tracef(level, "fcc", "%s" name, mbed_trace_array(buff, buff_size)))
 
 #undef __PV_LOG_H__INSIDE
 

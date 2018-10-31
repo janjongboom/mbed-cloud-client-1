@@ -1,12 +1,12 @@
 // ----------------------------------------------------------------------------
 // Copyright 2018 ARM Ltd.
-//  
+//
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
 // You may obtain a copy of the License at
-//  
+//
 //     http://www.apache.org/licenses/LICENSE-2.0
-//  
+//
 // Unless required by applicable law or agreed to in writing, software
 // distributed under the License is distributed on an "AS IS" BASIS,
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -79,7 +79,7 @@ namespace CertificateEnrollmentClient {
     * Zero current_cert pointer, then release the semaphore. Note that when the semaphore is released - new device renewals may be made.
     * Then call renewal_data->finish() and delete renewal_data.
     *
-    * \param renewal_data the data of the certificate to be renewed. 
+    * \param renewal_data the data of the certificate to be renewed.
     *        It is important that this is passed to the function because after releasing the semaphore - the global pointer may be replaced.
     * \param exit_status the status of the renewal process
     */
@@ -149,7 +149,7 @@ namespace CertificateEnrollmentClient {
     * \brief Start the renewal process.
     * Parse the certificate name, generate keys and CSR. Then call the EST client so the new certificate may be retrieved
     *
-    * \param renewal_data the data of the certificate to be renewed 
+    * \param renewal_data the data of the certificate to be renewed
     */
     static void certificate_renewal_start(CertificateRenewalDataBase *renewal_data);
 
@@ -176,7 +176,7 @@ void CertificateEnrollmentClient::call_user_cb_send_response(const uint8_t *tlv,
     (void)temp_obj.parse();
 
     // Call user callback with appropriate error
-    // In case of parsing error (malformed TLV), the provided ret_status will be returned and not 
+    // In case of parsing error (malformed TLV), the provided ret_status will be returned and not
     call_user_cert_renewal_cb(temp_obj.cert_name, ret_status, CE_INITIATOR_SERVER);
 
     // Send response to the server
@@ -253,8 +253,8 @@ ce_status_e CertificateEnrollmentClient::certificate_renew(const char *cert_name
         status = schedule_event(CertificateEnrollmentClient::EVENT_TYPE_RENEWAL_REQUEST);
         SA_PV_ERR_RECOVERABLE_GOTO_IF((status != CE_STATUS_SUCCESS), status = status, ReleseSemReturn, "Error scheduling event");
 
-        // If some error synchronous error has occurred before scheduling the event - release the semaphore we had just taken, 
-        // and then return the error without calling the user callback 
+        // If some error synchronous error has occurred before scheduling the event - release the semaphore we had just taken,
+        // and then return the error without calling the user callback
 ReleseSemReturn:
         if (status != CE_STATUS_SUCCESS) {
             pal_status = pal_osSemaphoreRelease(g_renewal_sem);
@@ -270,7 +270,7 @@ ReleseSemReturn:
         } else {
             status = CE_STATUS_ERROR;
         }
-        
+
     }
 
     SA_PV_LOG_INFO_FUNC_EXIT_NO_ARGS();
@@ -361,9 +361,9 @@ ce_status_e CertificateEnrollmentClient::init(M2MBaseList& list, const EstClient
 
 #ifdef CERT_ENROLLMENT_EST_MOCK
         PV_UNUSED_PARAM(est_client);
-        g_est_client = new EstClientMock();        
+        g_est_client = new EstClientMock();
         SA_PV_ERR_RECOVERABLE_RETURN_IF((!g_est_client), CE_STATUS_ERROR, "Error creating mock EST");
-#else 
+#else
         g_est_client = est_client;
 #endif
 
@@ -469,8 +469,8 @@ ce_status_e CertificateEnrollmentClient::schedule_event(event_type_e event_type)
 
     arm_event_s event = {
         .receiver = handler_id, // ID we got when creating our handler
-        .sender = 0, // Which tasklet sent us the event is irrelevant to us 
-        .event_type = event_type, // Indicate event type 
+        .sender = 0, // Which tasklet sent us the event is irrelevant to us
+        .event_type = static_cast<uint8_t>(event_type), // Indicate event type
         .event_id = 0, // We currently do not need an ID for a specific event - event type is enough
         .data_ptr = 0, // Not needed, data handled in internal structure
         .priority = ARM_LIB_LOW_PRIORITY_EVENT, // Application level priority
@@ -493,7 +493,7 @@ void CertificateEnrollmentClient::est_cb(est_enrollment_result_e result,
     ce_status_e status;
     SA_PV_LOG_INFO_FUNC_ENTER("result = %d", result);
 
-    PV_UNUSED_PARAM(context);	
+    PV_UNUSED_PARAM(context);
     if (result != EST_ENROLLMENT_SUCCESS || cert_chain == NULL) {
         return certificate_renewal_finish(current_cert, CE_STATUS_EST_ERROR);
     }
@@ -505,7 +505,7 @@ void CertificateEnrollmentClient::est_cb(est_enrollment_result_e result,
     if (status != CE_STATUS_SUCCESS) { // If event scheduling fails - free the chain context and finish the process
         SA_PV_LOG_INFO("Error scheduling event");
         g_est_client->free_cert_chain_context(current_cert->est_data);
-        
+
         // Make sure we do not keep an invalid pointer
         current_cert->est_data = NULL;
         certificate_renewal_finish(current_cert, status);
@@ -547,7 +547,7 @@ void CertificateEnrollmentClient::certificate_renewal_finish(CertificateRenewalD
     // Note: release of the mutex is before the deletion of the object (which holds the allocated cert_name)
     // and before the user callback is invoked (so that the user may call the renewal API successfully from within his callback)
     pal_status = pal_osSemaphoreRelease(g_renewal_sem);
-    if (PAL_SUCCESS != pal_status) { // 
+    if (PAL_SUCCESS != pal_status) { //
         exit_status = CE_STATUS_ERROR;
     }
 

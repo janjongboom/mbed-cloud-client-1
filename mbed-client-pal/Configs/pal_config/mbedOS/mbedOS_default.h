@@ -16,7 +16,9 @@
 
 #ifndef PAL_MBEDOS_CONFIGURATION_H_
 
+#ifndef TARGET_SIMULATOR
 #include "cmsis_os.h"
+#endif
 
 #if (defined(MBED_DEBUG) && !defined(DEBUG))
     #define DEBUG
@@ -41,6 +43,7 @@
 
 
 #ifndef PAL_RTOS_WAIT_FOREVER
+    #include "device.h"
     #define PAL_RTOS_WAIT_FOREVER osWaitForever
 #endif
 
