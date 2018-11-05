@@ -28,6 +28,8 @@
 #include "update-client-control-center/arm_uc_control_center.h"
 #include "update-client-control-center/arm_uc_pre_shared_key.h"
 
+#include "pal.h"
+
 #include "mbedtls/aes.h"
 
 #include <inttypes.h>

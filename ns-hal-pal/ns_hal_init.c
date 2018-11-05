@@ -48,7 +48,9 @@ void ns_hal_init(void *heap, size_t h_size, void (*passed_fptr)(heap_fail_t), me
     // We do not initialise randlib, as it should be done after
     // RF driver has started, to get MAC address and RF noise as seed.
     // We do not initialise trace - left to application.
+#if !MBED_CONF_NANOSTACK_HAL_EVENT_LOOP_DISPATCH_FROM_APPLICATION
     ns_event_loop_thread_create();
     ns_event_loop_thread_start();
+#endif
     initted = true;
 }

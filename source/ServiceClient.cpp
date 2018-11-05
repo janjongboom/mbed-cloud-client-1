@@ -60,6 +60,7 @@ ServiceClient::ServiceClient(ServiceClientCallback& callback)
 #endif
   _connector_client(this)
 {
+    tr_info("ServiceClient ctor");
 }
 
 ServiceClient::~ServiceClient()
@@ -139,7 +140,7 @@ void ServiceClient::initialize_and_register(M2MBaseList& reg_objs)
             FP1<void, int32_t> callback(this, &ServiceClient::update_error_callback);
             UpdateClient::UpdateClient(callback, _connector_client.m2m_interface(), this);
         }
-        // else branch is required for re-initialization. 
+        // else branch is required for re-initialization.
         else {
             finish_initialization();
         }

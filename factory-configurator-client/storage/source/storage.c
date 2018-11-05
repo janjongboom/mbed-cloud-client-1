@@ -313,7 +313,7 @@ kcm_status_e storage_file_open(kcm_ctx_s *ctx, const uint8_t *file_name, size_t 
     uint16_t esfs_mode = 0;        // FIXME - Unused, yet implemented
     bool success;
 
-    SA_PV_LOG_TRACE_FUNC_ENTER("file_name_length=%" PRIu32 "", (uint32_t)file_name_length);
+    SA_PV_LOG_TRACE_FUNC_ENTER("file_name %s file_name_length=%" PRIu32 "", file_name, (uint32_t)file_name_length);
 
     SA_PV_ERR_RECOVERABLE_RETURN_IF((ctx == NULL), KCM_STATUS_INVALID_PARAMETER, "Invalid context");
     SA_PV_ERR_RECOVERABLE_RETURN_IF((file_name == NULL), KCM_STATUS_INVALID_PARAMETER, "Invalid file name context");

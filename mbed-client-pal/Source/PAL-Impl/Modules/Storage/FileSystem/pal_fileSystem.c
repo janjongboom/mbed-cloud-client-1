@@ -60,7 +60,7 @@ palStatus_t pal_fsMkDir(const char *pathName)
 	ret = pal_plat_fsMkdir(pathName);
 	if ((PAL_SUCCESS != ret) && (PAL_ERR_FS_NAME_ALREADY_EXIST != ret))
 	{
-        PAL_LOG_ERR("Failed to create folder, was the storage properly initialized?");
+        PAL_LOG_ERR("Failed to create folder '%s', was the storage properly initialized?", pathName);
 	}
 
     return ret;
@@ -81,6 +81,8 @@ palStatus_t pal_fsRmDir(const char *pathName)
 palStatus_t pal_fsFopen(const char *pathName, pal_fsFileMode_t mode, palFileDescriptor_t *fd)
 {
     palStatus_t ret = PAL_SUCCESS;
+
+    PAL_LOG_INFO("fopen %s", pathName);
 
     PAL_VALIDATE_CONDITION_WITH_ERROR((fd == NULL), PAL_ERR_FS_INVALID_ARGUMENT)
     PAL_VALIDATE_CONDITION_WITH_ERROR((pathName == NULL), PAL_ERR_FS_INVALID_FILE_NAME)
@@ -228,11 +230,11 @@ palStatus_t pal_fsGetMountPoint(pal_fsStorageID_t dataID, size_t length, char *p
         {
             strncpy(path, pal_plat_fsGetDefaultRootFolder(dataID), length);
         }
-        else 
+        else
         {
             strncpy(path, g_RootFolder[dataID], length); // same buffer is used for active backup root dirs using indexing
         }
-        
+
     }
     else
     {
@@ -247,7 +249,7 @@ palStatus_t pal_fsFormat(pal_fsStorageID_t dataID)
     palStatus_t ret = PAL_SUCCESS;
     PAL_VALIDATE_CONDITION_WITH_ERROR((((int32_t)dataID < PAL_FS_PARTITION_PRIMARY) || ((int32_t)dataID >= PAL_FS_PARTITION_LAST)), PAL_ERR_INVALID_ARGUMENT)
 
-#if PAL_SIMULATOR_FS_RM_INSTEAD_OF_FORMAT //Simulator    
+#if PAL_SIMULATOR_FS_RM_INSTEAD_OF_FORMAT //Simulator
 	char rootFolder[PAL_MAX_FILE_AND_FOLDER_LENGTH] = {0};
 	ret = pal_fsGetMountPoint(dataID, PAL_MAX_FILE_AND_FOLDER_LENGTH, rootFolder);
 	if (PAL_SUCCESS == ret)
@@ -260,8 +262,8 @@ palStatus_t pal_fsFormat(pal_fsStorageID_t dataID)
 	}
 #else //Real life scenario
 	ret = pal_plat_fsFormat(dataID);
-#endif        
-    
+#endif
+
     return ret;
 }
 

@@ -37,6 +37,7 @@ MbedCloudClient::MbedCloudClient()
  _value_callback(NULL),
  _error_description(NULL)
 {
+    tr_info("MbedCloudClient ctor");
 }
 
 MbedCloudClient::~MbedCloudClient()
