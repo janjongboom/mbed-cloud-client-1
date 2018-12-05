@@ -18,6 +18,10 @@
 
 #include "sotp.h"
 
+#ifdef TARGET_SIMULATOR
+#pragma clang optimize off
+#endif
+
 #if (SYS_CONF_SOTP == SYS_CONF_SOTP_ENABLED)
 
 #include "sotp_shared_lock.h"
@@ -1092,4 +1096,8 @@ sotp_result_e sotp_probe(uint32_t type, uint16_t buf_len_bytes, uint32_t *buf, u
 }
 #endif
 
+#endif
+
+#ifdef TARGET_SIMULATOR
+#pragma clang optimize on
 #endif

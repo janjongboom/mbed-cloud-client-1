@@ -152,12 +152,18 @@ M2MResourceBase::~M2MResourceBase()
 #endif
 }
 
+#ifdef TARGET_SIMULATOR
+#pragma clang optimize off
+#endif
 M2MResourceBase::ResourceType M2MResourceBase::resource_instance_type() const
 {
     M2MBase::lwm2m_parameters_s* param = M2MBase::get_lwm2m_parameters();
     M2MBase::DataType type = param->data_type;
     return convert_data_type(type);
 }
+#ifdef TARGET_SIMULATOR
+#pragma clang optimize on
+#endif
 
 
 bool M2MResourceBase::set_execute_function(execute_callback callback)
