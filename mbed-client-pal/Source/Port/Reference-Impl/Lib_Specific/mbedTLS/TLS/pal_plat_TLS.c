@@ -204,11 +204,13 @@ int pal_plat_entropySourceTLS( void *data, unsigned char *output, size_t len, si
 PAL_PRIVATE int palTimingGetDelay( void *data );
 PAL_PRIVATE void palTimingSetDelay( void *data, uint32_t intMs, uint32_t finMs );
 
+unsigned char tls_entropy_buffer[sizeof(mbedtls_entropy_context)] = { 0 };
+
 palStatus_t pal_plat_initTLSLibrary(void)
 {
     palStatus_t status = PAL_SUCCESS;
 
-    g_entropy = (mbedtls_entropy_context*)malloc(sizeof(mbedtls_entropy_context));
+    g_entropy = (mbedtls_entropy_context*)tls_entropy_buffer;
     if (NULL == g_entropy)
     {
         status = PAL_ERR_NO_MEMORY;
@@ -306,6 +308,8 @@ palStatus_t pal_plat_addEntropySource(palEntropySource_f entropyCallback)
     return status;
 }
 
+unsigned char pal_tls_buffer[sizeof(palTLSConf_t)];
+unsigned char pal_tls_config_context[sizeof(platTlsConfiguraionContext)];
 
 palStatus_t pal_plat_initTLSConf(palTLSConfHandle_t* palConfCtx, palTLSTransportMode_t transportVersion, palDTLSSide_t methodType)
 {
@@ -320,14 +324,14 @@ palStatus_t pal_plat_initTLSConf(palTLSConfHandle_t* palConfCtx, palTLSTransport
         return PAL_ERR_INVALID_ARGUMENT;
     }
 
-    localConfigCtx = (palTLSConf_t*)malloc(sizeof(palTLSConf_t));
+    localConfigCtx = (palTLSConf_t*)pal_tls_buffer;
     if (NULL == localConfigCtx)
     {
         status = PAL_ERR_NO_MEMORY;
         goto finish;
     }
 
-    localConfigCtx->confCtx = (platTlsConfiguraionContext*)malloc(sizeof(platTlsConfiguraionContext));
+    localConfigCtx->confCtx = (platTlsConfiguraionContext*)pal_tls_config_context;
     if (NULL == localConfigCtx->confCtx)
     {
         status = PAL_ERR_NO_MEMORY;

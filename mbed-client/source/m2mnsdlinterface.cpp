@@ -144,6 +144,8 @@ extern "C" void nsdlinterface_tasklet_func(arm_event_s *event)
     }
 }
 
+unsigned char ns_heap[MBED_CLIENT_EVENT_LOOP_SIZE];
+
 M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandler &connection_handler)
 : _observer(observer),
   _endpoint(NULL),
@@ -188,7 +190,7 @@ M2MNsdlInterface::M2MNsdlInterface(M2MNsdlObserver &observer, M2MConnectionHandl
 
     sn_nsdl_set_context(_nsdl_handle, this);
 
-    ns_hal_init(NULL, MBED_CLIENT_EVENT_LOOP_SIZE, NULL, NULL);
+    ns_hal_init(ns_heap, MBED_CLIENT_EVENT_LOOP_SIZE, NULL, NULL);
     eventOS_scheduler_mutex_wait();
     if (M2MNsdlInterface::_tasklet_id < 0) {
         M2MNsdlInterface::_tasklet_id = eventOS_event_handler_create(nsdlinterface_tasklet_func, MBED_CLIENT_NSDLINTERFACE_TASKLET_INIT_EVENT);

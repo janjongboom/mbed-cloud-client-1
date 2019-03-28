@@ -21,7 +21,7 @@
 #include "mbedtls/asn1write.h"
 #include "mbedtls/x509_crt.h"
 #include "mbedtls/x509_csr.h"
-#endif 
+#endif
 #include "mbedtls/ctr_drbg.h"
 #include "mbedtls/sha256.h"
 #include "mbedtls/md.h"
@@ -48,7 +48,7 @@ typedef mbedtls_mpi palMP_t;
 typedef mbedtls_pk_context palECKey_t;
 
 #if (PAL_ENABLE_X509 == 1)
-typedef mbedtls_x509write_csr palx509CSR_t; 
+typedef mbedtls_x509write_csr palx509CSR_t;
 #endif
 
 typedef mbedtls_cipher_context_t palCipherCtx_t;
@@ -128,9 +128,9 @@ palStatus_t pal_plat_freeAes(palAesHandle_t *aes)
 {
     palStatus_t status = PAL_SUCCESS;
     palAes_t* localCtx = NULL;
-    
+
     localCtx = (palAes_t*)*aes;
-    
+
     mbedtls_aes_free(&localCtx->platCtx);
     free(localCtx);
     *aes = NULLPTR;
@@ -157,7 +157,7 @@ palStatus_t pal_plat_setAesKey(palAesHandle_t aes, const unsigned char* key, uin
         status = PAL_ERR_AES_INVALID_KEY_LENGTH;
     }
 
-    return status;    
+    return status;
 }
 
 palStatus_t pal_plat_aesCTR(palAesHandle_t aes, const unsigned char* input, unsigned char* output, size_t inLen, unsigned char iv[16], bool zeroOffset)
@@ -197,9 +197,9 @@ palStatus_t pal_plat_aesECB(palAesHandle_t aes, const unsigned char input[PAL_CR
 }
 
 palStatus_t pal_plat_sha256(const unsigned char* input, size_t inLen, unsigned char* output)
-{    
+{
     mbedtls_sha256(input, inLen, output, 0);
-     
+
     return PAL_SUCCESS;
 }
 #if (PAL_ENABLE_X509 == 1)
@@ -236,12 +236,12 @@ palStatus_t pal_plat_x509CertParse(palX509Handle_t x509, const unsigned char* in
 		{
 			status = PAL_ERR_NOT_SUPPORTED_CURVE;
 		}
-		
+
         else if (-(MBEDTLS_ERR_X509_UNKNOWN_SIG_ALG) == ((-platStatus) & 0xFF80))
         {
             status = PAL_ERR_INVALID_MD_TYPE;
         }
-        
+
         else
         {
             status = PAL_ERR_CERT_PARSING_FAILED;
@@ -274,13 +274,13 @@ PAL_PRIVATE palStatus_t pal_plat_X509GetField(palX509Ctx_t* x509Ctx, const char*
     mbedtls_x509_name *x509Name = &x509Ctx->crt.subject;
 
     fieldNameLength = strlen(fieldName);
-    while( x509Name ) 
+    while( x509Name )
     {
         platStatus = mbedtls_oid_get_attr_short_name(&x509Name->oid, &shortName);
         if (CRYPTO_PLAT_SUCCESS != platStatus)
         {
-            status = PAL_ERR_INVALID_IOD; 
-            break;  
+            status = PAL_ERR_INVALID_IOD;
+            break;
         }
         if (strncmp(shortName, fieldName, fieldNameLength) == 0)
         {
@@ -310,7 +310,7 @@ PAL_PRIVATE bool pal_isLeapYear(uint16_t year)
     else if ((year % 100) != 0)
     {
         result = true;
-    } 
+    }
     else
     {
         result = ((year % 400) == 0);
@@ -318,7 +318,7 @@ PAL_PRIVATE bool pal_isLeapYear(uint16_t year)
     return result;
 }
 
-PAL_PRIVATE palStatus_t pal_timegm( struct tm *tm, uint64_t* outTime) 
+PAL_PRIVATE palStatus_t pal_timegm( struct tm *tm, uint64_t* outTime)
 {
     uint64_t epoc = 0;
     uint8_t palMonthDays[] = {31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31};
@@ -337,10 +337,10 @@ PAL_PRIVATE palStatus_t pal_timegm( struct tm *tm, uint64_t* outTime)
         else
         {
             epoc += 365 * PAL_SECONDS_PER_DAY;
-        }      
+        }
     }
-    
-    for (uint8_t m = 1; m < tm->tm_mon; ++m) 
+
+    for (uint8_t m = 1; m < tm->tm_mon; ++m)
     {
         epoc += palMonthDays[m - 1] * PAL_SECONDS_PER_DAY;
         if (m == PAL_FEB_MONTH && pal_isLeapYear(tm->tm_year))
@@ -405,7 +405,7 @@ palStatus_t pal_plat_x509CertGetAttribute(palX509Handle_t x509Cert, palX509Attr_
                 time.tm_hour = localCtx->crt.valid_from.hour;
                 time.tm_min = localCtx->crt.valid_from.min;
                 time.tm_sec = localCtx->crt.valid_from.sec;
-                time.tm_isdst = -1;                                   //unknown DST 
+                time.tm_isdst = -1;                                   //unknown DST
                 status = pal_timegm(&time, &timeOfDay);
                 if (PAL_SUCCESS != status)
                 {
@@ -418,7 +418,7 @@ palStatus_t pal_plat_x509CertGetAttribute(palX509Handle_t x509Cert, palX509Attr_
             }
             *actualOutLenBytes = PAL_CRYPTO_CERT_DATE_LENGTH;
             break;
-	    
+
         case PAL_X509_VALID_TO:
             if ( PAL_CRYPTO_CERT_DATE_LENGTH > outLenBytes)
             {
@@ -447,10 +447,10 @@ palStatus_t pal_plat_x509CertGetAttribute(palX509Handle_t x509Cert, palX509Attr_
             }
             *actualOutLenBytes = PAL_CRYPTO_CERT_DATE_LENGTH;
             break;
-        
+
         case PAL_X509_CN_ATTR:
             status = pal_plat_X509GetField(localCtx, "CN", output, outLenBytes, actualOutLenBytes);
-            break; 
+            break;
 
         case PAL_X509_L_ATTR:
             status = pal_plat_X509GetField(localCtx, "L", output, outLenBytes, actualOutLenBytes);
@@ -459,7 +459,7 @@ palStatus_t pal_plat_x509CertGetAttribute(palX509Handle_t x509Cert, palX509Attr_
         case PAL_X509_OU_ATTR:
             status = pal_plat_X509GetField(localCtx, "OU", output, outLenBytes, actualOutLenBytes);
             break;
-        
+
         case PAL_X509_CERT_ID_ATTR:
             if (PAL_CERT_ID_SIZE > outLenBytes)
             {
@@ -582,9 +582,9 @@ palStatus_t pal_plat_mdInit(palMDHandle_t* md, palMDType_t mdType)
         goto finish;
     }
 
-    
+
     mbedtls_md_init(&localCtx->md);
-    
+
     switch (mdType)
     {
         case PAL_SHA256:
@@ -617,14 +617,14 @@ palStatus_t pal_plat_mdInit(palMDHandle_t* md, palMDType_t mdType)
                 status = PAL_ERR_CREATION_FAILED;
                 goto finish;
             }
-        default: 
+        default:
             {
                 PAL_LOG_ERR("Crypto md start setup  %" PRId32 "", platStatus);
                 status = PAL_ERR_GENERIC_FAILURE;
                 goto finish;
             }
     }
-    
+
     platStatus = mbedtls_md_starts(&localCtx->md);
     switch(platStatus)
     {
@@ -635,7 +635,7 @@ palStatus_t pal_plat_mdInit(palMDHandle_t* md, palMDType_t mdType)
                 status = PAL_ERR_MD_BAD_INPUT_DATA;
                 goto finish;
             }
-        default: 
+        default:
             {
                 PAL_LOG_ERR("Crypto md start status  %" PRId32 "", platStatus);
                 status = PAL_ERR_GENERIC_FAILURE;
@@ -666,7 +666,7 @@ palStatus_t pal_plat_mdUpdate(palMDHandle_t md, const unsigned char* input, size
         case MBEDTLS_ERR_MD_BAD_INPUT_DATA:
             status = PAL_ERR_MD_BAD_INPUT_DATA;
             break;
-        default: 
+        default:
             {
                 PAL_LOG_ERR("Crypto md update status %" PRId32 "", platStatus);
                 status = PAL_ERR_GENERIC_FAILURE;
@@ -689,7 +689,7 @@ palStatus_t pal_plat_mdGetOutputSize(palMDHandle_t md, size_t* bufferSize)
         PAL_LOG_ERR("Crypto md get size error");
         status = PAL_ERR_GENERIC_FAILURE;
     }
-    
+
     return status;
 }
 
@@ -707,12 +707,12 @@ palStatus_t pal_plat_mdFinal(palMDHandle_t md, unsigned char* output)
         case MBEDTLS_ERR_MD_BAD_INPUT_DATA:
             status = PAL_ERR_MD_BAD_INPUT_DATA;
             break;
-        default: 
+        default:
             {
                 PAL_LOG_ERR("Crypto md finish status %" PRId32 "", platStatus);
                 status = PAL_ERR_GENERIC_FAILURE;
             }
-    } 
+    }
     return status;
 }
 
@@ -761,7 +761,7 @@ palStatus_t pal_plat_verifySignature(palX509Handle_t x509, palMDType_t mdType, c
 finish:
     return status;
 }
-#endif 
+#endif
 
 palStatus_t pal_plat_ASN1GetTag(unsigned char **position, const unsigned char *end, size_t *len, uint8_t tag )
 {
@@ -769,7 +769,7 @@ palStatus_t pal_plat_ASN1GetTag(unsigned char **position, const unsigned char *e
     int32_t platStatus = CRYPTO_PLAT_SUCCESS;
     int platTag = 0;
 
-    switch (tag & PAL_ASN1_CLASS_BITS) 
+    switch (tag & PAL_ASN1_CLASS_BITS)
     {
         case 0x00:
             //MBEDTLS_ASN1_PRIMITIVE
@@ -889,7 +889,7 @@ palStatus_t pal_plat_CCMSetKey(palCCMHandle_t ctx, palCipherID_t id, const unsig
     palCCM_t* ccmCtx = (palCCM_t*)ctx;
     mbedtls_cipher_id_t mbedtls_cipher_id;
 
-    switch (id) 
+    switch (id)
     {
         case PAL_CIPHER_ID_AES:
             mbedtls_cipher_id = MBEDTLS_CIPHER_ID_AES;
@@ -956,12 +956,14 @@ palStatus_t pal_plat_CCMEncrypt(palCCMHandle_t ctx, unsigned char* input, size_t
     return status;
 }
 
+unsigned char pal_ctr_drbg_buffer[sizeof(palCtrDrbgCtx_t)];
+
 palStatus_t pal_plat_CtrDRBGInit(palCtrDrbgCtxHandle_t* ctx)
 {
     palStatus_t status = PAL_SUCCESS;
     palCtrDrbgCtx_t* palCtrDrbgCtx = NULL;
 
-    palCtrDrbgCtx = (palCtrDrbgCtx_t*)malloc(sizeof(palCtrDrbgCtx_t));
+    palCtrDrbgCtx = (palCtrDrbgCtx_t*)pal_ctr_drbg_buffer;
     if (NULL == palCtrDrbgCtx)
     {
         status = PAL_ERR_NO_MEMORY;
@@ -1002,7 +1004,7 @@ palStatus_t pal_plat_CtrDRBGIsSeeded(palCtrDrbgCtxHandle_t ctx)
     {
         return PAL_ERR_CTR_DRBG_NOT_SEEDED;
     }
-    else 
+    else
     {
         return PAL_ERR_GENERIC_FAILURE; // Having the reseed counter negative indicates some wierd error. Perhaps uninitialized context
     }
@@ -1032,8 +1034,8 @@ palStatus_t pal_plat_CtrDRBGSeedFromEntropySources(palCtrDrbgCtxHandle_t ctx, in
     if (status == PAL_ERR_CTR_DRBG_NOT_SEEDED) // First call - DRBG not seeded yet
     {
         platStatus = mbedtls_ctr_drbg_seed(&palCtrDrbgCtx->ctrDrbgCtx, f_entropy, &palCtrDrbgCtx->entropy, additionalData, additionalDataLen);
-    } 
-    
+    }
+
     /*
      * DRBG already seeded, so function was invoked for reseeding -
      * perhaps storage was deleted and new entropy injected.
@@ -1045,9 +1047,9 @@ palStatus_t pal_plat_CtrDRBGSeedFromEntropySources(palCtrDrbgCtxHandle_t ctx, in
     }
     else
     {
-        return PAL_ERR_GENERIC_FAILURE; 
+        return PAL_ERR_GENERIC_FAILURE;
     }
-    
+
     switch(platStatus)
     {
         case CRYPTO_PLAT_SUCCESS:
@@ -1228,7 +1230,7 @@ palStatus_t pal_plat_CMACFinish(palCMACHandle_t *ctx, unsigned char *output, siz
         *outLen = localCipher->cipher_info->block_size;
     }
 
-    
+
 
     mbedtls_cipher_free(localCipher);
     free(localCipher);
@@ -1274,7 +1276,7 @@ palStatus_t pal_plat_mdHmacSha256(const unsigned char *key, size_t keyLenInBytes
     return status;
 }
 
-//! Check EC private key function. 
+//! Check EC private key function.
 PAL_PRIVATE palStatus_t pal_plat_ECCheckPrivateKey(palECGroup_t* ecpGroup, palECKeyHandle_t key, bool *verified)
 {
     palStatus_t status = PAL_SUCCESS;
@@ -1297,7 +1299,7 @@ PAL_PRIVATE palStatus_t pal_plat_ECCheckPrivateKey(palECGroup_t* ecpGroup, palEC
     {
         *verified = true;
     }
-    
+
     return status;
 }
 
@@ -1324,7 +1326,7 @@ PAL_PRIVATE palStatus_t pal_plat_ECCheckPublicKey(palECGroup_t* ecpGroup, palECK
     {
         *verified = true;
     }
-    
+
     return status;
 }
 
@@ -1364,7 +1366,7 @@ palStatus_t pal_plat_ECKeyNew(palECKeyHandle_t* key)
         mbedtls_pk_init(localECKey);
         *key = (palECKeyHandle_t)localECKey;
     }
-    
+
     return status;
 }
 
@@ -1560,7 +1562,7 @@ palStatus_t pal_plat_ECKeyGenerateKey(palGroupIndex_t grpID, palECKeyHandle_t ke
         case PAL_ECP_DP_SECP256R1:
             platCurve = MBEDTLS_ECP_DP_SECP256R1;
             break;
-        default: 
+        default:
             status = PAL_ERR_NOT_SUPPORTED_CURVE;
             goto finish;
     }
@@ -1640,7 +1642,7 @@ palStatus_t pal_plat_ECGroupInitAndLoad(palCurveHandle_t* grp, palGroupIndex_t i
         case PAL_ECP_DP_SECP256R1:
             platCurve = MBEDTLS_ECP_DP_SECP256R1;
             break;
-        default: 
+        default:
             status = PAL_ERR_NOT_SUPPORTED_CURVE;
             goto finish;
     }
@@ -1654,7 +1656,7 @@ palStatus_t pal_plat_ECGroupInitAndLoad(palCurveHandle_t* grp, palGroupIndex_t i
     {
         *grp = (palCurveHandle_t)localGroup;
     }
-    
+
 finish:
     if (PAL_SUCCESS != status && localGroup != NULL)
     {
@@ -1689,7 +1691,7 @@ palStatus_t pal_plat_ECDHComputeKey(const palCurveHandle_t grp, const palECKeyHa
             status = PAL_ERR_FAILED_TO_COMPUTE_SHRED_KEY;
         }
     }
-    else 
+    else
     {
         status = PAL_ERR_INVALID_ARGUMENT;
     }
@@ -1857,15 +1859,15 @@ palStatus_t pal_plat_x509CSRSetKey(palx509CSRHandle_t x509CSR, palECKeyHandle_t 
             status = PAL_ERR_INVALID_ARGUMENT;
         }
     }
-    
+
     if (PAL_SUCCESS == status)
     {
         mbedtls_x509write_csr_set_key(localCSR, localPubKey);
     }
-    
+
     return status;
 }
-    
+
 palStatus_t pal_plat_x509CSRSetMD(palx509CSRHandle_t x509CSR, palMDType_t mdType)
 {
     palStatus_t status = PAL_SUCCESS;
@@ -1986,7 +1988,7 @@ palStatus_t pal_plat_x509CSRSetExtendedKeyUsage(palx509CSRHandle_t x509CSR, uint
         goto finish;
     }
 
-    // Set start and end pointer to the used part in value_buf and add the extension to the CSR 
+    // Set start and end pointer to the used part in value_buf and add the extension to the CSR
     start = end;
     end = value_buf + sizeof(value_buf);
     platStatus = mbedtls_x509write_csr_set_extension(localCSR, MBEDTLS_OID_EXTENDED_KEY_USAGE, MBEDTLS_OID_SIZE(MBEDTLS_OID_EXTENDED_KEY_USAGE),
@@ -2069,7 +2071,7 @@ palStatus_t pal_plat_x509CertGetHTBS(palX509Handle_t x509Cert, palMDType_t hash_
             status = PAL_ERR_INVALID_MD_TYPE;
             break;
     }
-    
+
     return status;
 }
 
@@ -2164,7 +2166,7 @@ palStatus_t pal_plat_x509CSRFromCertWriteDER(palX509Handle_t x509Cert, palx509CS
     char subject[512];
     int mbedtls_ret;
 
-    /** Note - we assume that the x509CSR object is already 
+    /** Note - we assume that the x509CSR object is already
     * initialized and contain at list a private key.
     */
 
@@ -2202,7 +2204,7 @@ palStatus_t pal_plat_x509CSRFromCertWriteDER(palX509Handle_t x509Cert, palx509CS
 PAL_PRIVATE int pal_plat_entropySourceDRBG( void *data, unsigned char *output, size_t len)
 {
     palCtrDrbgCtx_t* palCtrDrbgCtx = (palCtrDrbgCtx_t*)data;
-    
+
     // Simply signal to ourselves that the DRBG is seeded (we set the seed as the additional data when seeding)
     if (data)
     {
@@ -2215,7 +2217,7 @@ PAL_PRIVATE int pal_plat_entropySource( void *data, unsigned char *output, size_
 {
 	palStatus_t status = PAL_SUCCESS;
     (void)data;
-    
+
     status = pal_osRandomBuffer((uint8_t*) output, len);
     if (PAL_SUCCESS == status)
     {
